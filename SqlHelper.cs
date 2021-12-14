@@ -27,6 +27,8 @@ namespace flashcardsApp
 
                     // Create a the database
                     var tableCmd = connection.CreateCommand();
+
+                    //Create the database if it does not exist
                     tableCmd.CommandText =
                         $@"IF NOT EXISTS(SELECT * FROM sys.databases WHERE name = 'StudyDb') 
                         BEGIN 
@@ -47,6 +49,7 @@ namespace flashcardsApp
             {
                 Console.WriteLine(e.Message);
             }
+            MainMenu.GetUserCommand();
         }
         internal static void CreateTables()
         {
@@ -59,20 +62,24 @@ namespace flashcardsApp
                 //Create a new command associated with the connection.
                 var tableCmd = connection.CreateCommand();
 
-                //Create a table
+                //Create the tables
                 tableCmd.CommandText =
+                $@"IF NOT EXISTS(select * from sysobjects where name='stacks' and xtype='U') 
+                BEGIN 
+                CREATE TABLE stacks(
+                stackid     INTEGER PRIMARY KEY IDENTITY,
+                stackname   VARCHAR(150));
+                END;
 
-                    $@"create table stacks(
-                    stackid     INTEGER PRIMARY KEY IDENTITY,
-                    stackname   VARCHAR(150),
-                    )
-
-                    create table flashcards(
-                    id          INTEGER PRIMARY KEY IDENTITY,
-                    cardfront   VARCHAR(150),
-                    cardback    VARCHAR(150),
-                    stackid     INTEGER FOREIGN KEY REFERENCES stacks(stackid)
-                     )";
+                IF NOT EXISTS(select * from sysobjects where name='flashcards' and xtype='U') 
+                BEGIN 
+                CREATE TABLE flashcards(
+                id INTEGER  PRIMARY KEY IDENTITY,
+                cardfront   VARCHAR(150),
+                cardback    VARCHAR(150),
+                stackid     INTEGER FOREIGN KEY REFERENCES stacks(stackid));
+                END;
+                ";
 
                 //Execute the CommandText against the database
                 tableCmd.ExecuteNonQuery();

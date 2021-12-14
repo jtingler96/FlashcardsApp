@@ -13,25 +13,12 @@ namespace flashcardsApp
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("\nWelcome to Flashcards!\n");
-            Console.WriteLine("\nChecking for existing database...\n");
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.WriteLine("\nInitializing database\n");
+            Console.ForegroundColor = ConsoleColor.White;
 
-            //check for an existing database
-            string databasePath = ConfigurationManager.AppSettings.Get("DatabasePath");
-            bool dbPath = File.Exists(databasePath);
-
-            //If the database does not exist, create one
-            if (!dbPath)
-            {
-                Console.WriteLine("\n\nDatabase doesn't exist, creating one...\n\n");
-                SqlHelper.createDb();
-            }
-            //If a database exists continue to the controller
-            else
-            {
-                Console.WriteLine("\nInitializing database..\n");
-                FlashcardController.GetUserCommand();
-            };
+            SqlHelper.createDb();
+            
         }
     }
 }
