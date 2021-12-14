@@ -8,7 +8,7 @@ namespace flashcardsApp.Models
 {
      class Stack
     {
-        public int Id { get; set; }
+        public int StackId { get; set; }
         public string StackName { get; set; }
         public virtual ICollection<Flashcard> Flashcards { get; set; }
     }

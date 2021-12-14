@@ -12,24 +12,74 @@ namespace flashcardsApp
 {
     class SqlHelper
     {
-        public static void InitializeDB()
+        internal static void createDb()
         {
             //Open a connection to the database using the value of ConnectionString. If Mode=ReadWriteCreate is used (the default) the file is created, if it doesn't already exist.
-            string connectionString = ConfigurationManager.AppSettings.Get("ConnectionString");
-            using var connection = new SqlConnection(connectionString);
-            connection.Open();
-
-            // Create a sample database
-            Console.Write("Dropping and creating database 'StacksDb' ... ");
-            String sql = "DROP DATABASE IF EXISTS [StacksDb]; CREATE DATABASE [StacksDb]";
-            using (SqlCommand command = new SqlCommand(sql, connection))
+            string connectionString = "Server=(localdb)\\MSSQLLocalDB;Integrated Security=true;";
+            //Data Source = (local); Integrated Security = True; Connect Timeout = 30; Encrypt = False; TrustServerCertificate = False; ApplicationIntent = ReadWrite; MultiSubnetFailover = False
+            try
             {
-                command.ExecuteNonQuery();
-                Console.WriteLine("Done.");
-            }
+                SqlConnection connection = new SqlConnection(connectionString);
+                using (connection)
+                {
+                    // Open the connection to the server
+                    connection.Open();
 
-            // Create a Table and insert some sample data
-           
+                    // Create a the database
+                    var tableCmd = connection.CreateCommand();
+                    tableCmd.CommandText =
+                        $@"IF NOT EXISTS(SELECT * FROM sys.databases WHERE name = 'StudyDb') 
+                        BEGIN 
+                        CREATE DATABASE StudyDb;
+                        END;
+                        ";
+
+                    //Execute the CommandText against the database
+                    tableCmd.ExecuteNonQuery();
+
+                    //Close the connection to the database. Open transactions are rolled back.
+                    connection.Close();
+
+                }
+                CreateTables();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
+        internal static void CreateTables()
+        {
+            string connectionString = "Server=(localdb)\\MSSQLLocalDB; Initial Catalog=StudyDb; Integrated Security=true;";
+            SqlConnection connection = new SqlConnection(connectionString);
+            using (connection)
+            {
+                connection.Open();
+
+                //Create a new command associated with the connection.
+                var tableCmd = connection.CreateCommand();
+
+                //Create a table
+                tableCmd.CommandText =
+
+                    $@"create table stacks(
+                    stackid     INTEGER PRIMARY KEY IDENTITY,
+                    stackname   VARCHAR(150),
+                    )
+
+                    create table flashcards(
+                    id          INTEGER PRIMARY KEY IDENTITY,
+                    cardfront   VARCHAR(150),
+                    cardback    VARCHAR(150),
+                    stackid     INTEGER FOREIGN KEY REFERENCES stacks(stackid)
+                     )";
+
+                //Execute the CommandText against the database
+                tableCmd.ExecuteNonQuery();
+
+                //Close the connection to the database. Open transactions are rolled back.
+                connection.Close();
+            }
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Text;
 using System.Data.SqlClient;
 using System.Configuration;
 using System.IO;
-using FlashcardsApp;
+using flashcardsApp;
 using flashcardsApp.Models;
 using System.Linq;
 
@@ -24,7 +24,7 @@ namespace flashcardsApp
             if (!dbPath)
             {
                 Console.WriteLine("\n\nDatabase doesn't exist, creating one...\n\n");
-                SqlHelper.InitializeDB();
+                SqlHelper.createDb();
             }
             //If a database exists continue to the controller
             else
