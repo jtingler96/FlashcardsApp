@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FlashcardsApp
 {
-    class StudyMenu
+    class StudyHome
     {
         internal static void studyCards()
         {

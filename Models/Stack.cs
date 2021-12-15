@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace flashcardsApp.Models
 {
-     class Stack
+    class Stack
     {
         public int StackId { get; set; }
         public string StackName { get; set; }
-        public virtual ICollection<Flashcard> Flashcards { get; set; }
     }
 }
