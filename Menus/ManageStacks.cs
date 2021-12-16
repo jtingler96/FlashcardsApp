@@ -25,7 +25,7 @@ namespace FlashcardsApp.Menus
             Console.WriteLine("\nType 2 to create a stack");
             Console.WriteLine("\nType 3 to delete a stack");
             Console.WriteLine("\nType 4 to edit a stack name");
-            Console.WriteLine("\nType 5 to return to the manage flashcards menu");
+            Console.WriteLine("\nType 5 to return to the manager menu");
 
             //assign user input to a string
             string userInput = InputHelper.inputInt();
@@ -61,7 +61,7 @@ namespace FlashcardsApp.Menus
                     break;
                 case 5:
                     //Return to main menu
-                    MainMenu.GetUserCommand();
+                    ManagerHome.managerMenu();
                     break;
                 default:
                     Console.ForegroundColor = ConsoleColor.Red;
@@ -178,7 +178,9 @@ namespace FlashcardsApp.Menus
             {
                 connection.Open();
                 var tableCmd = connection.CreateCommand();
-                tableCmd.CommandText = $"DELETE from stacks WHERE stackid = '{Id}'";
+                tableCmd.CommandText =
+                    $"DELETE s FROM stacks s WHERE s.stackid = '{Id}' " +
+                    $"DELETE f FROM flashcards f WHERE f.stackid = '{Id}'";
                 int rowCount = tableCmd.ExecuteNonQuery();
                 while (rowCount == 0)
                 {

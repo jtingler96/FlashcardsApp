@@ -1,4 +1,7 @@
-﻿using System;
+﻿using ConsoleTableExt;
+using flashcardsApp.Models;
+using FlashcardsApp.Models;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -37,7 +40,7 @@ namespace FlashcardsApp.Menus
                     Environment.Exit(0);
                     break;
                 case 1:
-                    //viewCards();
+                    viewCards();
                     //Return to manage menu
                     manageCards();
                     break;
@@ -47,12 +50,12 @@ namespace FlashcardsApp.Menus
                     manageCards();
                     break;
                 case 3:
-                    //editCards();
+                    editCards();
                     //Return to main menu
                     manageCards();
                     break;
                 case 4:
-                    //deleteCards();
+                    deleteCards();
                     //Return to main menu
                     manageCards();
                     break;
@@ -69,43 +72,57 @@ namespace FlashcardsApp.Menus
             }
         }
 
-        //internal static void viewStacks()
-        //{
-        //    string connectionString = "Server=(localdb)\\MSSQLLocalDB;Integrated Security=true;Initial Catalog=StudyDb;";
-        //    using (var connection = new SqlConnection(connectionString))
-        //    {
-        //        string sql = $"SELECT stackid, stackname FROM stacks";
-        //        connection.Open();
-        //        SqlCommand cmd = new SqlCommand(sql, connection);
+        internal static void viewCards()
+        {
+            string connectionString = "Server=(localdb)\\MSSQLLocalDB;Integrated Security=true;Initial Catalog=StudyDb;";
+            using (var connection = new SqlConnection(connectionString))
+            {
+                Console.WriteLine("\n");
+                Console.WriteLine("Enter the ID of the stack of cards you want to view");
 
-        //        List<Stack> tableData = new List<Stack>();
-        //        SqlDataReader reader = cmd.ExecuteReader();
+                string userInput = InputHelper.inputInt();
 
-        //        if (reader.HasRows)
-        //        {
-        //            while (reader.Read())
-        //            {
-        //                tableData.Add(
-        //                new Stack
-        //                {
-        //                    StackId = reader.GetInt32(0),
-        //                    StackName = reader.GetString(1),
-        //                });
-        //            }
-        //        }
-        //        else
-        //        {
-        //            Console.WriteLine("No rows found");
-        //        }
-        //        reader.Close();
-        //        Console.WriteLine("\n\n");
+                int stackId = Convert.ToInt32(userInput);
 
-        //        ConsoleTableBuilder
-        //            .From(tableData)
-        //            .ExportAndWriteLine();
-        //        Console.WriteLine("\n\n");
-        //    }
-        //}
+                string sql = $"SELECT f.id, f.cardfront, f.cardback, s.stackname FROM flashcards f JOIN stacks s ON s.stackid = f.stackid AND s.stackid = {stackId}";
+                
+                connection.Open();
+                SqlCommand cmd = new SqlCommand(sql, connection);
+
+                List<StackOfFlashcards> tableData = new List<StackOfFlashcards>();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                        tableData.Add(
+                        new StackOfFlashcards
+                        {
+                            Id = reader.GetInt32(0),
+                            CardFront = reader.GetString(1),
+                            CardBack = reader.GetString(2),
+                            StackName = reader.GetString(3),
+                        });
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("\n");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("No rows found");
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+                reader.Close();
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                ConsoleTableBuilder
+                    .From(tableData)
+                    .ExportAndWriteLine();
+                Console.WriteLine("\n");
+                Console.ForegroundColor = ConsoleColor.White;
+            }
+        }
 
         internal static void createCards()
         {
@@ -130,75 +147,81 @@ namespace FlashcardsApp.Menus
                 cmd.Parameters["cardfront"].Value = cardFront;
                 cmd.Parameters.Add("cardback", SqlDbType.VarChar);
                 cmd.Parameters["cardback"].Value = cardBack;
-                cmd.Parameters.Add("stackid", SqlDbType.VarChar);
+                cmd.Parameters.Add("stackid", SqlDbType.Int);
                 cmd.Parameters["stackid"].Value = stackId;
                 cmd.ExecuteNonQuery();
 
-                Console.WriteLine($"\n\nYour card was added to stack with ID: {stackId}\n\n");
+                Console.WriteLine($"\n\nYour card was added to stack with ID: {stackId},\n the front of the card says: {cardFront},\n and the back of the card says: {cardBack}\n\n");
 
             }
         }
 
-        //internal static void editStack()
-        //{
-        //    Console.WriteLine("\n\nType Id of the stack would like to edit. Type 0 to return to the menu.\n\n");
+        internal static void editCards()
+        {
+            Console.WriteLine("\n\nType Id of the flashcard would like to edit. Type 0 to return to the menu.\n\n");
 
-        //    string userInput = InputHelper.inputInt();
+            string userInput = InputHelper.inputInt();
 
-        //    int Id = Convert.ToInt32(userInput);
+            int Id = Convert.ToInt32(userInput);
 
-        //    if (Id == 0) manageStacks();
+            if (Id == 0) manageCards();
 
-        //    using (var connection = new SqlConnection(connectionString))
-        //    {
-        //        connection.Open();
+            using (var connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
 
-        //        var checkCmd = connection.CreateCommand();
-        //        checkCmd.CommandText = $"SELECT stackid FROM stacks where stackid = {Id}";
-        //        int checkQuery = Convert.ToInt32(checkCmd.ExecuteScalar());
+                var checkCmd = connection.CreateCommand();
+                checkCmd.CommandText = $"SELECT id, cardfront, cardback, stackid FROM flashcards where id = {Id}";
+                int checkQuery = Convert.ToInt32(checkCmd.ExecuteScalar());
 
-        //        if (checkQuery == 0)
-        //        {
-        //            Console.WriteLine($"\n\nRecord with Id {Id} doesn't exist.\n\n");
-        //            editStack();
-        //        }
+                if (checkQuery == 0)
+                {
+                    Console.WriteLine($"\n\nRecord with Id {Id} doesn't exist.\n\n");
+                    editCards();
+                }
 
-        //        Console.WriteLine("\nEnter the new stack name\n");
-        //        string stackname = Console.ReadLine();
+                Console.WriteLine("\nEnter the ID of the stack you would like to add to.\n");
+                string stackId = Console.ReadLine();
 
-        //        var tableCmd = connection.CreateCommand();
-        //        tableCmd.CommandText = $"UPDATE stacks SET stackname = '{stackname}' WHERE stackid = {Id}";
-        //        tableCmd.ExecuteNonQuery();
+                Console.WriteLine("\nWhat would you like the front of the flashcard to say?\n");
+                string cardFront = Console.ReadLine();
 
-        //        Console.WriteLine($"\n\nThe new stack name is: {stackname}\n\n");
-        //        connection.Close();
-        //    }
-        //}
-        //internal static void deleteStacks()
-        //{
-        //    Console.WriteLine("\n\nType the Id of the stack you want to remove. Type 0 to return to the menu.\n\n");
+                Console.WriteLine("\nWhat would you like the back of the flashcard to say?\n");
+                string cardBack = Console.ReadLine();
 
-        //    int Id = Int32.Parse(InputHelper.inputInt());
+                var tableCmd = connection.CreateCommand();
+                tableCmd.CommandText = $"UPDATE flashcards SET cardfront = '{cardFront}', cardback = '{cardBack}', stackid = '{stackId}' WHERE id = '{Id}'";
+                tableCmd.ExecuteNonQuery();
 
-        //    if (Id == 0) manageStacks();
+                Console.WriteLine($"\n\nYour flashcard was updated and added to the stack with an ID of: {stackId},\n the front of the card says: {cardFront},\n and the back of the card says: {cardBack}\n\n");
+                connection.Close();
+            }
+        }
+        internal static void deleteCards()
+        {
+            Console.WriteLine("\n\nType the Id of the flashcard you want to remove. Type 0 to return to the menu.\n\n");
 
-        //    using (var connection = new SqlConnection(connectionString))
-        //    {
-        //        connection.Open();
-        //        var tableCmd = connection.CreateCommand();
-        //        tableCmd.CommandText = $"DELETE from stacks WHERE stackid = '{Id}'";
-        //        int rowCount = tableCmd.ExecuteNonQuery();
-        //        while (rowCount == 0)
-        //        {
-        //            Console.WriteLine($"\n\nClass with Id {Id} doesn't exist. Try Again or type 0 to return to main menu. \n\n");
-        //            Id = Int32.Parse(InputHelper.inputInt());
+            int Id = Int32.Parse(InputHelper.inputInt());
 
-        //            if (Id == 0) manageStacks();
+            if (Id == 0) manageCards();
 
-        //            if (rowCount != 0) break;
-        //        }
-        //        Console.WriteLine("\n\n\nstack was removed\n\n");
-        //    }
-        //}
+            using (var connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                var tableCmd = connection.CreateCommand();
+                tableCmd.CommandText = $"DELETE from flashcards WHERE id = '{Id}'";
+                int rowCount = tableCmd.ExecuteNonQuery();
+                while (rowCount == 0)
+                {
+                    Console.WriteLine($"\n\nClass with Id {Id} doesn't exist. Try Again or type 0 to return to main menu. \n\n");
+                    Id = Int32.Parse(InputHelper.inputInt());
+
+                    if (Id == 0) deleteCards();
+
+                    if (rowCount != 0) break;
+                }
+                Console.WriteLine($"\n\nThe flashcard with an ID of: {Id} was removed\n\n");
+            }
+        }
     }
 }
