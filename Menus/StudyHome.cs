@@ -1,5 +1,6 @@
 ﻿using flashcardsApp;
 using flashcardsApp.Models;
+using FlashcardsApp.Menus;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -66,6 +67,7 @@ namespace FlashcardsApp
             string connectionString = "Server=(localdb)\\MSSQLLocalDB;Integrated Security=true;Initial Catalog=StudyDb;";
             using (var connection = new SqlConnection(connectionString))
             {
+                ManageStacks.viewStacks();
                 Console.WriteLine("\n");
                 Console.WriteLine("Enter the ID of the stack of cards you want to view");
 

@@ -14,8 +14,9 @@ namespace flashcardsApp
         static void Main(string[] args)
         {
             Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.WriteLine("\nInitializing database\n");
-            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("\nLoading...\n");
+            System.Threading.Thread.Sleep(300);
+            Console.Clear();
 
             SqlHelper.createDb();
             

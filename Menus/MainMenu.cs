@@ -17,7 +17,6 @@ namespace flashcardsApp
         //Give the user some instructions and display an options menu
         internal static void GetUserCommand()
         {
-            Console.Clear();
             Console.ForegroundColor = ConsoleColor.DarkCyan;
             Console.WriteLine("\nWelcome to StudyConsole\n");
             Console.ForegroundColor = ConsoleColor.White;
@@ -38,16 +37,17 @@ namespace flashcardsApp
                     Environment.Exit(0);
                     break;
                 case 1:
-                    //Return to main menu
+                    //Study Menu
+                    Console.Clear();
                     StudyHome.studyCards();
-                    GetUserCommand();
                     break;
                 case 2:
+                    //Manager Menu
+                    Console.Clear();
                     ManagerHome.managerMenu();
-                    //Return to main menu
-                    GetUserCommand();
                     break;
                 default:
+                    Console.Clear();
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("\n************   Please select an option from the menu   ************\n");
                     //Return to main menu

@@ -17,7 +17,6 @@ namespace FlashcardsApp
         internal static string connectionString = "Server=(localdb)\\MSSQLLocalDB;Integrated Security=true;Initial Catalog=StudyDb;";
         internal static void managerMenu()
         {
-            Console.Clear();
             Console.ForegroundColor = ConsoleColor.Magenta;
             Console.WriteLine("\nManager menu");
             Console.WriteLine("------------------------------");
@@ -40,16 +39,19 @@ namespace FlashcardsApp
                     Environment.Exit(0);
                     break;
                 case 1:
+                    Console.Clear();
                     ManageStacks.manageStacks();
                     //Return to manage menu
                     managerMenu();
                     break;
                 case 2:
+                    Console.Clear();
                     ManageCards.manageCards();
                     //Return to manage menu
                     managerMenu();
                     break;
                 case 3:
+                    Console.Clear();
                     //Return to main menu
                     MainMenu.GetUserCommand();
                     break;
