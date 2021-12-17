@@ -13,6 +13,7 @@ namespace FlashcardsApp
     {
         internal static void studyCards()
         {
+            Console.Clear();
             Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.WriteLine("\nStudy flashcards");
             Console.WriteLine("------------------------------");

@@ -16,6 +16,7 @@ namespace FlashcardsApp.Menus
         internal static string connectionString = "Server=(localdb)\\MSSQLLocalDB;Integrated Security=true;Initial Catalog=StudyDb;";
         internal static void manageStacks()
         {
+            Console.Clear();
             Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.WriteLine("\nManage stacks");
             Console.WriteLine("------------------------------");
