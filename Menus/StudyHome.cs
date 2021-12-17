@@ -1,6 +1,8 @@
 ﻿using flashcardsApp;
+using flashcardsApp.Models;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,6 +36,7 @@ namespace FlashcardsApp
                     Environment.Exit(0);
                     break;
                 case 1:
+                    studyByStack();
                     //Return to study menu
                     studyCards();
                     break;
@@ -55,6 +58,74 @@ namespace FlashcardsApp
                     //Return to study menu
                     studyCards();
                     break;
+            }
+        }
+        internal static void studyByStack()
+        {
+            string connectionString = "Server=(localdb)\\MSSQLLocalDB;Integrated Security=true;Initial Catalog=StudyDb;";
+            using (var connection = new SqlConnection(connectionString))
+            {
+                Console.WriteLine("\n");
+                Console.WriteLine("Enter the ID of the stack of cards you want to view");
+
+                string userInput = InputHelper.inputInt();
+
+                int stackId = Convert.ToInt32(userInput);
+
+                string sql = $"SELECT f.id, f.cardfront, f.cardback, s.stackname FROM flashcards f JOIN stacks s ON s.stackid = f.stackid AND s.stackid = {stackId}";
+
+                connection.Open();
+                SqlCommand cmd = new SqlCommand(sql, connection);
+
+                List<string> tableData = new List<string>();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                if (reader.HasRows)
+                {
+                    reader.Read();
+                    string stackName = reader.GetString(3);
+                    Console.Clear();
+                    Console.WriteLine($"You picked {stackName}! Great Choice.");
+                    Console.WriteLine("Press any key to begin studying");
+                    Console.ReadLine();
+                    Console.Clear();
+
+                    //Since the reader was already called, the while loop will skip over the first card if it is not called now
+                    string cardFrontOne = reader.GetString(1);
+                    Console.WriteLine($"{cardFrontOne}");
+                    Console.WriteLine("\n\n\n\n\npress any key to view the answer");
+                    Console.ReadLine();
+
+                    string cardBackOne = reader.GetString(2);
+                    Console.WriteLine($"\n\n\n\n\n{cardBackOne}");
+                    Console.ReadLine();
+                    Console.Clear();
+                    while (reader.Read())
+                    {
+                        string cardFront = reader.GetString(1);
+                        tableData.Add(cardFront);
+                        Console.WriteLine($"{cardFront}");
+                        Console.WriteLine("\n\n\n\n\npress any key to view the answer");
+                        Console.ReadLine();
+
+                        string cardBack = reader.GetString(2);
+                        tableData.Add(cardBack);
+                        Console.WriteLine($"\n\n\n\n\n{cardBack}");
+                        Console.ReadLine();
+                    }
+                }
+                else
+                {
+                  
+                    Console.WriteLine("\n");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("No rows found");
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+                reader.Close();
+
+
+
             }
         }
     }
